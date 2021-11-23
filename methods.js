@@ -22,7 +22,7 @@ const userPortrait = []
 export function appOnPageNotFound(options) {
   if (!config.onPageNotFound) return
   const { onPageNotFound } = options.App
-  options.App.onPageNotFound = function(e) {
+  options.App.onPageNotFound = function (e) {
     Params.v = JSON.stringify(e)
     consoleLogs('appOnPageNotFound')
     onPageNotFound && onPageNotFound.call(options.App, ...arguments)
@@ -42,12 +42,12 @@ export function consoleLogs(title) {
 export function enableJsError(options) {
   if (!config.enableJsError) return
   const { onError } = options.App
-  options.App.onError = function(e) {
+  options.App.onError = function (e) {
     Params.et = 'error'
     Params.v = {
       err: JSON.stringify(e)
     }
-    dataUplaod()
+    dataReport()
     consoleLogs('enableJsError')
     if (onError) onError.call(options.App)
   }
@@ -79,11 +79,11 @@ export function enablePageLodTime() {
   if (!config.enablePageLoadTime) return
   if (utils.isPageClose(_thisPage, 'enablePageLoadTime')) return
   const onReady = _thisPage.onReady
-  _thisPage.onReady = function() {
+  _thisPage.onReady = function () {
     PageInfo.pageEndLoadTime = Date.now()
     Params.et = 'load'
     Params.v = { _loadTime: PageInfo.pageEndLoadTime - PageInfo.pageStartLoadTime }
-    dataUplaod()
+    dataReport()
     consoleLogs('enablePageLoadTime')
     onReady && onReady.call(_thisPage)
   }
@@ -97,9 +97,9 @@ export function enablePageDisplayBlock() {
   if (!config.enablePageDisplay) return
   if (utils.isPageClose(_thisPage, 'enablePageDisplay')) return
   const onShow = _thisPage.onShow
-  _thisPage.onShow = function() {
+  _thisPage.onShow = function () {
     Params.et = 'access'
-    dataUplaod()
+    dataReport()
     consoleLogs('enablePageDisplay')
     userOperationRecord('enablePageDisplay')
     onShow && onShow.call(_thisPage)
@@ -110,7 +110,7 @@ export function enablePageDisplayBlock() {
  * 页面隐藏监听
  * */
 function onPageHide(fn) {
-  return function() {
+  return function () {
     enablePageSayTime()
     pageHidden()
     fn.call(this)
@@ -131,7 +131,7 @@ function pageHidden() {
   if (utils.isPageClose(_thisPage, 'enablePageDisplayNone')) return
   Params.et = 'leave'
   Params.v = { _leaveTime: PageInfo.pageHiddenTime }
-  dataUplaod()
+  dataReport()
   consoleLogs('enablePageDisplayNone')
   userOperationRecord('enablePageDisplayNone')
 }
@@ -145,20 +145,20 @@ export function enablePageSayTime() {
   if (utils.isPageClose(_thisPage, 'enablePageSayTime')) return
   Params.et = 'stay'
   Params.v = { _stayTime: PageInfo.pageHiddenTime - PageInfo.pageShowTime }
-  dataUplaod()
+  dataReport()
   consoleLogs('enablePageSayTime')
 }
 
 /**
  * 自定义上报事件
+ * @param callback {function(Params)}
  * */
-export function enableCustomEvents({ query = {}, event }) {
-  if (event) Params.setEventInfo(event)
+export function enableCustomEvents(callback) {
   if (!config.enableCustomEvents) return
   if (utils.isPageClose(_thisPage, 'enableCustomEvents')) return
-  Params.v = query
-  Params.et = 'custom'
-  dataUplaod()
+  if (callback) callback(Params)
+  if (!Params.et) Params.et = 'custom'
+  dataReport()
   consoleLogs('enableCustomEvents')
   userOperationRecord('enableCustomEvents')
 }
@@ -168,7 +168,7 @@ export function enableCustomEvents({ query = {}, event }) {
  * */
 export function enableAppLoad(options) {
   const { onLaunch } = options.App
-  options.App.onLaunch = function(op) {
+  options.App.onLaunch = function (op) {
     onLaunch && onLaunch.call(this, ...arguments)
     if (op.query && op.query[options.ot]) {
       Params.ot = op.query[options.ot]
@@ -194,7 +194,7 @@ export function enableAppLoadTime() {
 export function enableAppOnShow(options) {
   if (!config.enableAppOnShow) return
   const onShow = options.App.onShow
-  options.App.onShow = function() {
+  options.App.onShow = function () {
     onShow && onShow.call(this)
     PageInfo.appShowTime = Date.now()
     Params.v = {
@@ -211,7 +211,7 @@ export function enableAppOnShow(options) {
 export function enableAppOnHidden(options) {
   if (!config.enableAppOnHidden) return
   const onHide = options.App.onHide
-  options.App.onHide = function() {
+  options.App.onHide = function () {
     onHide && onHide.call(this)
     PageInfo.appHiddenTime = Date.now()
     Params.v = {
@@ -231,12 +231,12 @@ export function enablePageOnClick() {
   if (utils.isPageClose(_thisPage, 'enablePageOnClick')) return
   const pageConfig = utils.getPageConfig(_thisPage)
   if (pageConfig && pageConfig.methods.length > 0) {
-    const methods = this.$options.methods
+    const methods = _this.$options.methods
     for (const fName in methods) {
       if (Object.hasOwnProperty.call(methods, fName) && pageConfig.methods.includes(fName)) {
         const copyEv = methods[fName]
-        this[fName] = function($event = {}) {
-          customEv.call(this, $event, { fName: fName })
+        this[fName] = function ($event = {}) {
+          customEv($event, { fName: fName })
           copyEv.call(_this, ...arguments)
         }
       }
@@ -244,13 +244,14 @@ export function enablePageOnClick() {
   }
 }
 
+
 function customEv($event = {}, query = {}) {
   Params.setEventInfo($event)
   Params.v = query
   Params.rm = Date.now()
   Params.el = query.fName || ''
   Params.v._name = '自定义上报事件'
-  dataUplaod()
+  dataReport()
   consoleLogs('enablePageOnClick', Params)
   userOperationRecord('enablePageOnClick')
 }
@@ -268,7 +269,7 @@ export function userOperationRecord(title) {
  *参数序列化
  * */
 export function queryParse(data, enObj = {}) {
-  if (data && Object.keys(data).length == 0) return enObj
+  if (data && Object.keys(data).length === 0) return enObj
   for (const key in data) {
     if (typeof data[key] === 'object' && Object.hasOwnProperty.call(data, key)) {
       queryParse(data[key], enObj)
@@ -282,9 +283,9 @@ export function queryParse(data, enObj = {}) {
 /**
  * 数据上报
  * */
-function dataUplaod() {
-  if (Params.ot && Params.et != 'access') Params.ot = ''
-  if (config.beforeUpdate) config.beforeUpdate.call(Params)
+async function dataReport() {
+  if (Params.ot && Params.et !== 'access') Params.ot = ''
+  if (config.beforeUpdate) await config.beforeUpdate(Params)
   const obj = queryParse(Params.v, {})
   delete Params.v
   const jsonData = { ...Params, ...obj }

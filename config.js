@@ -42,9 +42,9 @@ export default {
       methods: ['buy']
     }
   ],
-  beforeUpdate: function() {
+  beforeUpdate: function (Params) {
     // this  =>  params
-    this.oid = 'openId'
-    this.uid = 'userId'
+    Params.oid = 'openId'
+    Params.uid = 'userId'
   }
 }
