@@ -12,15 +12,15 @@ const PageInfo = {
   appStartLoadTime: 0,
   appEndLoadTime: 0
 }
-let _this
-let _thisPage
+let _this  // Vue组件实例对象存储
+let _thisPage   // 页面实例
 const userPortrait = []
 
 /**
  * 页面不存在
  * */
 export function appOnPageNotFound(options) {
-  if (!config.onPageNotFound) return
+  if (utils.useSwitch('appOnPageNotFound')) return
   const { onPageNotFound } = options.App
   options.App.onPageNotFound = function (e) {
     Params.v = JSON.stringify(e)
@@ -28,6 +28,7 @@ export function appOnPageNotFound(options) {
     onPageNotFound && onPageNotFound.call(options.App, ...arguments)
   }
 }
+
 
 /**
  * 日志打印
@@ -40,7 +41,7 @@ export function consoleLogs(title) {
  * JS错误监听
  */
 export function enableJsError(options) {
-  if (!config.enableJsError) return
+  if (utils.useSwitch('useSwitch')) return
   const { onError } = options.App
   options.App.onError = function (e) {
     Params.et = 'error'
@@ -49,7 +50,7 @@ export function enableJsError(options) {
     }
     dataReport()
     consoleLogs('enableJsError')
-    if (onError) onError.call(options.App)
+    onError && onError.call(options.App)
   }
 }
 
@@ -59,7 +60,7 @@ export function enableJsError(options) {
 export function enablePageLoad(that) {
   _this = that
   _thisPage = that.$mp.page
-  const query = _this.$mp.query
+  const query = that.$mp.query
   PageInfo.pageStartLoadTime = Date.now()
   Params.ref = Params.ul || '/'
   Params.ul = _thisPage.route
@@ -76,8 +77,7 @@ export function enablePageLoad(that) {
  * 页面加载时间
  * */
 export function enablePageLodTime() {
-  if (!config.enablePageLoadTime) return
-  if (utils.isPageClose(_thisPage, 'enablePageLoadTime')) return
+  if (utils.useSwitch('enablePageLoadTime', _thisPage)) return
   const onReady = _thisPage.onReady
   _thisPage.onReady = function () {
     PageInfo.pageEndLoadTime = Date.now()
@@ -94,8 +94,7 @@ export function enablePageLodTime() {
  * */
 export function enablePageDisplayBlock() {
   PageInfo.pageShowTime = Date.now()
-  if (!config.enablePageDisplay) return
-  if (utils.isPageClose(_thisPage, 'enablePageDisplay')) return
+  if (utils.useSwitch('enablePageDisplay', _thisPage)) return
   const onShow = _thisPage.onShow
   _thisPage.onShow = function () {
     Params.et = 'access'
@@ -127,8 +126,7 @@ export function enablePageDisplayNone() {
  *页面离开或隐藏
  * */
 function pageHidden() {
-  if (config.enablePageDisplayNone === false) return
-  if (utils.isPageClose(_thisPage, 'enablePageDisplayNone')) return
+  if (utils.useSwitch('enablePageDisplayNone', _thisPage)) return
   Params.et = 'leave'
   Params.v = { _leaveTime: PageInfo.pageHiddenTime }
   dataReport()
@@ -141,8 +139,7 @@ function pageHidden() {
  */
 export function enablePageSayTime() {
   PageInfo.pageHiddenTime = Date.now()
-  if (config.enablePageSayTime === false) return
-  if (utils.isPageClose(_thisPage, 'enablePageSayTime')) return
+  if (utils.useSwitch('enablePageSayTime', _thisPage)) return
   Params.et = 'stay'
   Params.v = { _stayTime: PageInfo.pageHiddenTime - PageInfo.pageShowTime }
   dataReport()
@@ -154,8 +151,7 @@ export function enablePageSayTime() {
  * @param callback {function(Params)}
  * */
 export function enableCustomEvents(callback) {
-  if (!config.enableCustomEvents) return
-  if (utils.isPageClose(_thisPage, 'enableCustomEvents')) return
+  if (utils.useSwitch('enableCustomEvents', _thisPage)) return
   if (callback) callback(Params)
   if (!Params.et) Params.et = 'custom'
   dataReport()
@@ -167,6 +163,7 @@ export function enableCustomEvents(callback) {
  * 应用启动
  * */
 export function enableAppLoad(options) {
+  if (utils.useSwitch('enableAppLoad')) return
   const { onLaunch } = options.App
   options.App.onLaunch = function (op) {
     onLaunch && onLaunch.call(this, ...arguments)
@@ -192,13 +189,13 @@ export function enableAppLoadTime() {
  * 应用显示
  * */
 export function enableAppOnShow(options) {
-  if (!config.enableAppOnShow) return
+  if (utils.useSwitch('enableAppOnShow')) return
   const onShow = options.App.onShow
   options.App.onShow = function () {
     onShow && onShow.call(this)
     PageInfo.appShowTime = Date.now()
     Params.v = {
-      name: 'enableAppOnShow'
+      _name: 'enableAppOnShow'
     }
     consoleLogs('enableAppOnShow')
     userOperationRecord('enableAppOnShow')
@@ -209,13 +206,13 @@ export function enableAppOnShow(options) {
  * 应用隐藏
  * */
 export function enableAppOnHidden(options) {
-  if (!config.enableAppOnHidden) return
+  if (utils.useSwitch('enableAppOnHidden')) return
   const onHide = options.App.onHide
   options.App.onHide = function () {
     onHide && onHide.call(this)
     PageInfo.appHiddenTime = Date.now()
     Params.v = {
-      name: 'enableAppOnHidden',
+      _name: 'enableAppOnHidden',
       appShowTime: PageInfo.appShowTime - PageInfo.appHiddenTime
     }
     consoleLogs('enableAppOnHidden')
@@ -227,8 +224,7 @@ export function enableAppOnHidden(options) {
  * 页面配置点击事件
  * */
 export function enablePageOnClick() {
-  if (config.enablePageOnClick === false) return
-  if (utils.isPageClose(_thisPage, 'enablePageOnClick')) return
+  if (utils.useSwitch('enablePageOnClick', _thisPage)) return
   const pageConfig = utils.getPageConfig(_thisPage)
   if (pageConfig && pageConfig.methods.length > 0) {
     const methods = _this.$options.methods
@@ -247,10 +243,8 @@ export function enablePageOnClick() {
 
 function customEv($event = {}, query = {}) {
   Params.setEventInfo($event)
-  Params.v = query
-  Params.rm = Date.now()
   Params.el = query.fName || ''
-  Params.v._name = '自定义上报事件'
+  Object.assign(Params.v, query, { _name: '自定义上报事件' })
   dataReport()
   consoleLogs('enablePageOnClick', Params)
   userOperationRecord('enablePageOnClick')
@@ -260,7 +254,7 @@ function customEv($event = {}, query = {}) {
  * 用户操作记录
  * */
 export function userOperationRecord(title) {
-  if (!config.userOperationRecord) return
+  if (utils.useSwitch('userOperationRecord')) return
   userPortrait.push({ title, Params: JSON.stringify(Params), dateTime: Date.now() })
   config.debug && console.log(userPortrait)
 }
@@ -283,9 +277,10 @@ export function queryParse(data, enObj = {}) {
 /**
  * 数据上报
  * */
-async function dataReport() {
+function dataReport() {
+  Params.rm = Date.now()
   if (Params.ot && Params.et !== 'access') Params.ot = ''
-  if (config.beforeUpdate) await config.beforeUpdate(Params)
+  if (config.beforeUpdate) config.beforeUpdate(Params)
   const obj = queryParse(Params.v, {})
   delete Params.v
   const jsonData = { ...Params, ...obj }

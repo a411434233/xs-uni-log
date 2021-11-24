@@ -43,7 +43,6 @@ export default {
     }
   ],
   beforeUpdate: function (Params) {
-    // this  =>  params
     Params.oid = 'openId'
     Params.uid = 'userId'
   }

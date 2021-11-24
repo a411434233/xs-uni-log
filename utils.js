@@ -18,11 +18,11 @@ export default {
     if (envOptions.isWechat) pageConfig = config.watchList.find(value => value.path.indexOf(page.route) >= 0)
     return pageConfig
   },
-  isPageClose(page, switchName) {
-    if (page === undefined) return console.error('page不存在', switchName)
+  useSwitch(switchName, page = undefined) {
+    if (config[switchName] === false) return true
+    if (page === undefined) return false
     const pageConfig = this.getPageConfig(page)
     if (pageConfig === undefined) return false
     return pageConfig[switchName] === false
   }
-
 }
