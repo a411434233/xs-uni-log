@@ -13,7 +13,7 @@ export default (Vue, options = { App: undefined }) => {
     enableAppOnShow.call(Vue, options) // 应用显示
     enableAppOnHidden.call(Vue, options) // 应用隐藏
     enableJsError.call(Vue, options) // JS错误监听
-  } else console.error('配置项缺少App')
+  } else console.error('配置项缺少App配置项')
 
   Vue.prototype.$report = enableCustomEvents
   Vue.mixin({

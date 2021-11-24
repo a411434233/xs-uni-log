@@ -30,18 +30,7 @@ export default {
   onPageNotFound: true,
   // JS错误
   enableJsError: true,
-  watchList: [
-    {
-      title: '首页',
-      path: '/pages/home/indexs/index',
-      methods: ['toBlind']
-    },
-    {
-      title: '双11盲盒活动页',
-      path: '/pages/blindBox/index',
-      methods: ['buy']
-    }
-  ],
+  watchList: [],
   beforeUpdate: function (Params) {
     Params.oid = 'openId'
     Params.uid = 'userId'
