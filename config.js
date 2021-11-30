@@ -2,34 +2,34 @@ export default {
   aid: 'appId',
   tag: 'clientId',
   ot: 'query', // 来源渠道名称
-  url: 'https://xsmddata.cn-hangzhou.log.aliyuncs.com/logstores/mddatatest/track.gif?APIVersion=0.6.0', // 上报接口
-  debug: true, // 日志打印
+  url: 'https://xsmddata.cn-hangzhou.log.aliyuncs.com/logstores/mddatatest/track.gif?APIVersion=0.6.0', // 上报接口(测试）
+  debug: false, // 日志打印
   // 应用隐藏
-  enableAppOnHidden: true,
+  enableAppOnHidden: false,
   // 应用显示
-  enableAppOnShow: true,
+  enableAppOnShow: false,
   // 监听小程序启动
-  enableAppLoad: true,
+  enableAppLoad: false,
   // 监听小程序切入后台
-  enableAppHide: true,
+  enableAppHide: false,
   // 页面加载时长
-  enablePageLoadTime: true,
+  enablePageLoadTime: false,
   // 自定义代码上报事件
-  enableCustomEvents: true,
+  enableCustomEvents: false,
   // 页面配置点击事件
-  enablePageOnClick: true,
+  enablePageOnClick: false,
   // 页面停留时长
-  enablePageSayTime: true,
+  enablePageSayTime: false,
   // 页面访问量
-  enablePageDisplay: true,
+  enablePageDisplay: false,
   // 页面隐藏
-  enablePageDisplayNone: true,
+  enablePageDisplayNone: false,
   // 用户操作记录
-  userOperationRecord: true,
+  userOperationRecord: false,
   // 页面不存在
-  onPageNotFound: true,
+  onPageNotFound: false,
   // JS错误
-  enableJsError: true,
+  enableJsError: false,
   watchList: [],
   beforeUpdate: function (Params) {
     Params.oid = 'openId'

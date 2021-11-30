@@ -19,7 +19,9 @@ export default {
     return pageConfig
   },
   useSwitch(switchName, page = undefined) {
+    config.debug && console.log(config[switchName], switchName)
     if (config[switchName] === false) return true
+    if (config[switchName] === undefined) return true
     if (page === undefined) return false
     const pageConfig = this.getPageConfig(page)
     if (pageConfig === undefined) return false

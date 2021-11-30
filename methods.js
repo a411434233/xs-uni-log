@@ -20,15 +20,14 @@ const userPortrait = []
  * 页面不存在
  * */
 export function appOnPageNotFound(options) {
-  if (utils.useSwitch('appOnPageNotFound')) return
+  if (utils.useSwitch('onPageNotFound')) return
   const { onPageNotFound } = options.App
   options.App.onPageNotFound = function (e) {
     Params.v = JSON.stringify(e)
-    consoleLogs('appOnPageNotFound')
+    consoleLogs('onPageNotFound')
     onPageNotFound && onPageNotFound.call(options.App, ...arguments)
   }
 }
-
 
 /**
  * 日志打印
@@ -41,7 +40,7 @@ export function consoleLogs(title) {
  * JS错误监听
  */
 export function enableJsError(options) {
-  if (utils.useSwitch('useSwitch')) return
+  if (utils.useSwitch('enableJsError')) return
   const { onError } = options.App
   options.App.onError = function (e) {
     Params.et = 'error'
@@ -164,7 +163,7 @@ export function enableCustomEvents(callback) {
  * */
 export function enableAppLoad(options) {
   if (utils.useSwitch('enableAppLoad')) return
-  const { onLaunch } = options.App
+  const onLaunch = options.App.onLaunch
   options.App.onLaunch = function (op) {
     onLaunch && onLaunch.call(this, ...arguments)
     if (op.query && op.query[options.ot]) {
@@ -174,6 +173,8 @@ export function enableAppLoad(options) {
       Params.ot = op.scene
       Params.tag = Params.ot
     }
+    Params.et = 'appLoad'
+    dataReport()
     consoleLogs('enableAppLoad')
   }
 }

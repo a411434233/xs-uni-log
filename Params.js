@@ -14,7 +14,7 @@ class Params {
     this.ex = ''	// 事件触发 x 坐标
     this.ey = ''	// 事件触发 y 坐标
     this.el = ''	// 事件名称  xs_event_xxxxx
-    this.et = '' // 事件类型 访问（access）/关注/收藏(collect)/点击(click)/搜索(search)/离开（leave） /停留（stay）/异常（error) / 自定义（custom)
+    this.et = '' // 事件类型 访问（access）/关注/收藏(collect)/点击(click|tap)/搜索(search)/离开（leave）/停留（stay）/异常（error) / 自定义（custom)
     this.aid = '' // appid
     this.uid = '' // userid
     this.oid = '' // openId
