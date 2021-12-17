@@ -31,8 +31,6 @@ export default {
   // JS错误
   enableJsError: false,
   watchList: [],
-  beforeUpdate: function (Params) {
-    Params.oid = 'openId'
-    Params.uid = 'userId'
+  beforeUpdate: function(Params) {
   }
 }

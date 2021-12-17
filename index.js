@@ -12,20 +12,25 @@ export default (Vue, options = { App: undefined }) => {
     enableAppOnShow.call(Vue, options) // 应用显示
     enableAppOnHidden.call(Vue, options) // 应用隐藏
     enableJsError.call(Vue, options) // JS错误监听
-  } else console.error('配置项缺少App配置项')
-
+  } else {
+    console.error('配置项缺少App配置项')
+  }
   Vue.prototype.$report = enableCustomEvents
   Vue.mixin({
-    onLoad: function () {
+    onLoad: function() {
       enablePageLoad(this) // 页面加载
       enablePageLodTime() // 页面加载时间
-      enablePageDisplayBlock() // 页面访问量(显示)
-      enablePageDisplayNone() // 用户离开页面 （页面停留时长)
     },
-    onShow() {},
+    onShow() {
+      enablePageDisplayBlock(this) // 页面访问量(显示)
+    },
     onReady() {},
-    onHide() {},
-    onUnload() {},
+    onHide() {
+      enablePageDisplayNone(this) // 用户离开页面 （页面停留时长)
+    },
+    onUnload() {
+      enablePageDisplayNone(this)// 用户离开页面 （页面停留时长)
+    },
     onShareAppMessage() {}
   })
 }

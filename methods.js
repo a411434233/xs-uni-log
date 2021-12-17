@@ -22,7 +22,7 @@ const userPortrait = []
 export function appOnPageNotFound(options) {
   if (utils.useSwitch('onPageNotFound')) return
   const { onPageNotFound } = options.App
-  options.App.onPageNotFound = function (e) {
+  options.App.onPageNotFound = function(e) {
     Params.v = JSON.stringify(e)
     consoleLogs('onPageNotFound')
     onPageNotFound && onPageNotFound.call(options.App, ...arguments)
@@ -42,7 +42,7 @@ export function consoleLogs(title) {
 export function enableJsError(options) {
   if (utils.useSwitch('enableJsError')) return
   const { onError } = options.App
-  options.App.onError = function (e) {
+  options.App.onError = function(e) {
     Params.et = 'error'
     Params.v = {
       err: JSON.stringify(e)
@@ -61,7 +61,8 @@ export function enablePageLoad(that) {
   _thisPage = that.$mp.page
   const query = that.$mp.query
   PageInfo.pageStartLoadTime = Date.now()
-  Params.ref = Params.ul || '/'
+  let ul = Params.ul
+  Params.ref = ul || '/'
   Params.ul = _thisPage.route
   if (query && query[config.ot]) {
     Params.ot = query[config.ot]
@@ -78,7 +79,7 @@ export function enablePageLoad(that) {
 export function enablePageLodTime() {
   if (utils.useSwitch('enablePageLoadTime', _thisPage)) return
   const onReady = _thisPage.onReady
-  _thisPage.onReady = function () {
+  _thisPage.onReady = function() {
     PageInfo.pageEndLoadTime = Date.now()
     Params.et = 'load'
     Params.v = { _loadTime: PageInfo.pageEndLoadTime - PageInfo.pageStartLoadTime }
@@ -91,40 +92,28 @@ export function enablePageLodTime() {
 /**
  * 页面显示监听
  * */
-export function enablePageDisplayBlock() {
+export function enablePageDisplayBlock(that) {
+  if (typeof that.$mp.page === 'undefined') return
+  _this = that
+  _thisPage = that.$mp.page
   PageInfo.pageShowTime = Date.now()
   if (utils.useSwitch('enablePageDisplay', _thisPage)) return
-  const onShow = _thisPage.onShow
-  _thisPage.onShow = function () {
-    Params.et = 'access'
-    dataReport()
-    consoleLogs('enablePageDisplay')
-    userOperationRecord('enablePageDisplay')
-    onShow && onShow.call(_thisPage)
-  }
-}
-
-/**
- * 页面隐藏监听
- * */
-function onPageHide(fn) {
-  return function () {
-    enablePageSayTime()
-    pageHidden()
-    fn.call(this)
-  }
-}
-
-export function enablePageDisplayNone() {
-  const { onHide, onUnload } = _thisPage
-  _thisPage.onHide = onPageHide(onHide)
-  _thisPage.onUnload = onPageHide(onUnload)
+  let ul = Params.ul
+  Params.ref = ul || '/'
+  Params.ul = _thisPage.route
+  Params.et = 'access'
+  dataReport()
+  consoleLogs('enablePageDisplay')
+  userOperationRecord('enablePageDisplay')
 }
 
 /**
  *页面离开或隐藏
+ *
  * */
-function pageHidden() {
+export function enablePageDisplayNone(that) {
+  _thisPage = that.$mp.page
+  enablePageSayTime()
   if (utils.useSwitch('enablePageDisplayNone', _thisPage)) return
   Params.et = 'leave'
   Params.v = { _leaveTime: PageInfo.pageHiddenTime }
@@ -164,7 +153,7 @@ export function enableCustomEvents(callback) {
 export function enableAppLoad(options) {
   if (utils.useSwitch('enableAppLoad')) return
   const onLaunch = options.App.onLaunch
-  options.App.onLaunch = function (op) {
+  options.App.onLaunch = function(op) {
     onLaunch && onLaunch.call(this, ...arguments)
     if (op.query && op.query[options.ot]) {
       Params.ot = op.query[options.ot]
@@ -192,7 +181,7 @@ export function enableAppLoadTime() {
 export function enableAppOnShow(options) {
   if (utils.useSwitch('enableAppOnShow')) return
   const onShow = options.App.onShow
-  options.App.onShow = function () {
+  options.App.onShow = function() {
     onShow && onShow.call(this)
     PageInfo.appShowTime = Date.now()
     Params.v = {
@@ -209,7 +198,7 @@ export function enableAppOnShow(options) {
 export function enableAppOnHidden(options) {
   if (utils.useSwitch('enableAppOnHidden')) return
   const onHide = options.App.onHide
-  options.App.onHide = function () {
+  options.App.onHide = function() {
     onHide && onHide.call(this)
     PageInfo.appHiddenTime = Date.now()
     Params.v = {
@@ -232,7 +221,7 @@ export function enablePageOnClick() {
     for (const fName in methods) {
       if (Object.hasOwnProperty.call(methods, fName) && pageConfig.methods.includes(fName)) {
         const copyEv = methods[fName]
-        this[fName] = function ($event = {}) {
+        this[fName] = function($event = {}) {
           customEv($event, { fName: fName })
           copyEv.call(_this, ...arguments)
         }
@@ -240,7 +229,6 @@ export function enablePageOnClick() {
     }
   }
 }
-
 
 function customEv($event = {}, query = {}) {
   Params.setEventInfo($event)
