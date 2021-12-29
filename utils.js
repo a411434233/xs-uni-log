@@ -1,4 +1,4 @@
-import config from './config.js'
+import config from './config'
 
 const envOptions = {
   isWechat: false,
@@ -28,3 +28,4 @@ export default {
     return pageConfig[switchName] === false
   }
 }
+

@@ -1,6 +1,6 @@
-import config from './config.js'
-import Params from './Params.js'
-import utils from './utils.js'
+import config from './config'
+import Params from './Params'
+import utils from './utils'
 
 const PageInfo = {
   pageShowTime: 0,
@@ -22,7 +22,7 @@ const userPortrait = []
 export function appOnPageNotFound(options) {
   if (utils.useSwitch('onPageNotFound')) return
   const { onPageNotFound } = options.App
-  options.App.onPageNotFound = function(e) {
+  options.App.onPageNotFound = function (e) {
     Params.v = JSON.stringify(e)
     consoleLogs('onPageNotFound')
     onPageNotFound && onPageNotFound.call(options.App, ...arguments)
@@ -42,7 +42,7 @@ export function consoleLogs(title) {
 export function enableJsError(options) {
   if (utils.useSwitch('enableJsError')) return
   const { onError } = options.App
-  options.App.onError = function(e) {
+  options.App.onError = function (e) {
     Params.et = 'error'
     Params.v = {
       err: JSON.stringify(e)
@@ -79,7 +79,7 @@ export function enablePageLoad(that) {
 export function enablePageLodTime() {
   if (utils.useSwitch('enablePageLoadTime', _thisPage)) return
   const onReady = _thisPage.onReady
-  _thisPage.onReady = function() {
+  _thisPage.onReady = function () {
     PageInfo.pageEndLoadTime = Date.now()
     Params.et = 'load'
     Params.v = { _loadTime: PageInfo.pageEndLoadTime - PageInfo.pageStartLoadTime }
@@ -153,7 +153,7 @@ export function enableCustomEvents(callback) {
 export function enableAppLoad(options) {
   if (utils.useSwitch('enableAppLoad')) return
   const onLaunch = options.App.onLaunch
-  options.App.onLaunch = function(op) {
+  options.App.onLaunch = function (op) {
     onLaunch && onLaunch.call(this, ...arguments)
     if (op.query && op.query[options.ot]) {
       Params.ot = op.query[options.ot]
@@ -181,7 +181,7 @@ export function enableAppLoadTime() {
 export function enableAppOnShow(options) {
   if (utils.useSwitch('enableAppOnShow')) return
   const onShow = options.App.onShow
-  options.App.onShow = function() {
+  options.App.onShow = function () {
     onShow && onShow.call(this)
     PageInfo.appShowTime = Date.now()
     Params.v = {
@@ -198,7 +198,7 @@ export function enableAppOnShow(options) {
 export function enableAppOnHidden(options) {
   if (utils.useSwitch('enableAppOnHidden')) return
   const onHide = options.App.onHide
-  options.App.onHide = function() {
+  options.App.onHide = function () {
     onHide && onHide.call(this)
     PageInfo.appHiddenTime = Date.now()
     Params.v = {
@@ -221,7 +221,7 @@ export function enablePageOnClick() {
     for (const fName in methods) {
       if (Object.hasOwnProperty.call(methods, fName) && pageConfig.methods.includes(fName)) {
         const copyEv = methods[fName]
-        this[fName] = function($event = {}) {
+        this[fName] = function ($event = {}) {
           customEv($event, { fName: fName })
           copyEv.call(_this, ...arguments)
         }

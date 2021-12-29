@@ -1,6 +1,6 @@
 import config from './config.js'
 import { appOnPageNotFound, enableAppLoad, enableAppOnHidden, enableAppOnShow, enableCustomEvents, enableJsError, enablePageDisplayBlock, enablePageDisplayNone, enablePageLoad, enablePageLodTime } from './methods.js'
-import Params from './Params.js'
+import Params from './Params'
 
 export default (Vue, options = { App: undefined }) => {
   Params.init(config)
@@ -17,7 +17,7 @@ export default (Vue, options = { App: undefined }) => {
   }
   Vue.prototype.$report = enableCustomEvents
   Vue.mixin({
-    onLoad: function() {
+    onLoad: function () {
       enablePageLoad(this) // 页面加载
       enablePageLodTime() // 页面加载时间
     },
