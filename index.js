@@ -2,6 +2,10 @@ import config from './config.js'
 import { appOnPageNotFound, enableAppLoad, enableAppOnHidden, enableAppOnShow, enableCustomEvents, enableJsError, enablePageDisplayBlock, enablePageDisplayNone, enablePageLoad, enablePageLodTime } from './methods.js'
 import Params from './Params'
 
+/**
+ * @param Vue
+ * @param options {Config}
+ * */
 export default (Vue, options = { App: undefined }) => {
   Params.init(config)
   Params.init(options)
