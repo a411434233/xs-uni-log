@@ -93,7 +93,7 @@ export function enablePageLodTime() {
  * 页面显示监听
  * */
 export function enablePageDisplayBlock(that) {
-  if (typeof that.$mp.page === 'undefined') return
+  if (typeof that.$mp?.page === 'undefined') return
   _this = that
   _thisPage = that.$mp.page
   PageInfo.pageShowTime = Date.now()
@@ -112,7 +112,7 @@ export function enablePageDisplayBlock(that) {
  *
  * */
 export function enablePageDisplayNone(that) {
-  _thisPage = that.$mp.page
+  _thisPage = that.$mp?.page
   enablePageSayTime()
   if (utils.useSwitch('enablePageDisplayNone', _thisPage)) return
   Params.et = 'leave'
